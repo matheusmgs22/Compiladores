@@ -1,0 +1,2 @@
+int teste = 11; // testando uma coisa aqui 23342
+boolean outroTeste = true; // teste
