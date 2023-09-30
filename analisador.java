@@ -3,7 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AnalisadorLexico {
+public class analisador {
     ArrayList<String> num_int = new ArrayList<String>();
     ArrayList<String> num_decimal = new ArrayList<String>();
     ArrayList<String> identificador = new ArrayList<String>();

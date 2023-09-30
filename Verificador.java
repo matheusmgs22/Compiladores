@@ -1,9 +1,11 @@
 
 public class Verificador {
-
     // Verifica se é um número.
     public boolean isNumber(char x) {
         return x >= '0' && x <= '9';
+    }
+    public boolean isDecimal(char x) {
+        return x == '.';
     }
 
     // Verificar se é um caracter.
@@ -12,49 +14,23 @@ public class Verificador {
     }
 
     // Verificar se é um operador matematico.
-    public boolean isOperatorMath(char x) {
-        return (x == '*' || x == '/' || x == '%');
-    }
-
-    // Verificar se é uma soma.
-    public boolean isOperatorMost(char x) {
-        return x == '+';
-    }
-
-    // Verificar se é uma subtração.
-    public boolean isOperatorLess(char x) {
-        return x == '-';
+    public boolean isOperatorAritmetico(char x) {
+        return (x == '*' || x == '/' || x == '%' || x == '+' || x == '-' || x == '/');
     }
 
     // Verificar se é uma igualdade.
-    public boolean isOperatorEquals(char x) {
+    public boolean isOperatorAtribuicao(char x) {
         return x == '=';
     }
 
     // Verificar se é uma comparação.
+    public boolean isOperatorLogico(char x) {
+        return x == '|' || x == '&' || x == '!';
+    }
+
+    // Verificar se é maior ou menor que.
     public boolean isOperatorComparacao(char x) {
-        return x == '|' || x == '&';
-    }
-
-    // Verificar se é maior ou menor que.
-    public boolean isOperatorComparacaoMa(char x) {
         return x == '>' || x == '<';
-    }
-
-    // Verificar se é maior ou menor que.
-    public boolean isOperatorFinalLine(char x) {
-        return x == ';';
-    }
-
-    // Verificar se é negação.
-    public boolean isOperatorDenial(char x) {
-        return x == '!';
-    }
-
-    // Verificar se é negação.
-    public boolean isOperatorBar(char x) {
-        return x == '/';
-
     }
 
     // Verificar quebra de linha ou espaco
@@ -68,6 +44,9 @@ public class Verificador {
         return x == '(' || x == ')' || x == '[' || x == ']' || x == '[' ||
                 x == ']' || x == '{' || x == '}' || x == ',' || x == '.' ||
                 x == ':';
+    }
+    public boolean isEndOfLine(char x) {
+        return x == ';';
     }
 
     // Verificar se é caracter

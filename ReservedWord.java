@@ -11,6 +11,8 @@ public enum ReservedWord {
     SCANF,
     PRINTLN,
     MAIN,
-    RETURN
+    RETURN,
+    TRUE,
+    FALSE
 
 }
