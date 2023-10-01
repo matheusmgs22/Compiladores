@@ -28,7 +28,7 @@ public class AnalisadorLexico {
         //  variáveis usadas
         int i = 0, ultimaPosicao = 0;
         char posicao, posicaoAnterior;
-        boolean achou = false, achou2 = false, id = false, decimal = false;
+        boolean achou = false, achou2 = false, id = false, decimal = false, lendoTexto = false, erro = false;
         String token = "";
         String [] palavraReservadas = {"int", "float", "char", "boolean", "void", "double", "if", "else", "for", 
         "while", "scanf", "println", "main", "abstract", "assert", "return", "break", "byte", "case", "catch",
@@ -105,27 +105,13 @@ public class AnalisadorLexico {
                         }
                     }
                     index = 0;
-                }
-                // String.valueOf(line.charAt(z)) != "*/"
-                // line.replaceAll(String.valueOf(line.charAt(z)), "");  
-                //if(index != 0) {
-                 //       linhaSemComentario = line.substring(0, index - 1);
-                  //      linhas.add(linhaSemComentario);
-                  //  }         
-                //else if(line.contains("*/")) {
-//
-                 //   index = line.indexOf("*/");
-                  //  if(index != 0) {
-                  //      linhaSemComentario = line.substring(0, index - 1 );
-                  //      linhas.add(linhaSemComentario);
-                  //  }
-                //}       
+                }    
                 else {
                     linhas.add(line);
                 }
                 line = br.readLine();
             }
-            
+
             // loop principal para categorizar os tokens
             for(i = 0; i < linhas.size(); i++) {
 
@@ -133,8 +119,20 @@ public class AnalisadorLexico {
                     posicao = linhas.get(i).charAt(z);
                     ultimaPosicao = linhas.get(i).length() - 1;
 
+                    // verifica se está lendo um texto entre aspas duplas
+                    if (lendoTexto) {
+                        token += posicao;
+                        if (posicao == '"') {
+                            lendoTexto = false;
+                            erro = false;
+                            texto.add(token);
+                            token = "";
+                
+                        }
+                        continue;
+                    }
                     // verifica se é inteiro
-                    if(verificador.isNumber(posicao)) {
+                    else if(verificador.isNumber(posicao)) {
                         estado = 1;
                         token += posicao;
                         if(z > 0) {
@@ -150,6 +148,7 @@ public class AnalisadorLexico {
                                     num_decimal.add(token);
                                     token = "";
                                     estado = 0;
+                        
                                     continue;
                                 }
 
@@ -162,6 +161,7 @@ public class AnalisadorLexico {
                                     num_decimal.add(token);
                                     token = "";
                                     estado = 0;
+                        
                                     continue;
                                 }
                             }
@@ -176,6 +176,7 @@ public class AnalisadorLexico {
                             num_int.add(token);
                             token = "";
                             estado = 0;
+                
                             continue;
                         }
                     }
@@ -197,11 +198,13 @@ public class AnalisadorLexico {
                             palavraReservada.add(token);
                             token = "";
                             estado = 0;
+                
                            }
                            else {
                             identificador.add(token);
                             token = "";
                             estado = 0;
+                
                            }
                         }
                         else {
@@ -209,6 +212,7 @@ public class AnalisadorLexico {
                                 palavraReservada.add(token);
                                 estado = 0;
                                 token = "";
+                    
                             }
                         }
                         continue;
@@ -222,18 +226,21 @@ public class AnalisadorLexico {
                             num_int.add(token);
                             token = "";
                             estado = 0;
+                
                         }
                         else if(estado == 2) {
                             num_decimal.add(token);
                             decimal = false;
                             token = "";
                             estado = 0;
+                
                         }
                         else if(estado == 3) {
                             identificador.add(token);
                             id = false;
                             token = "";
                             estado = 0;
+                
                         }
 
                         // verifica se é símbolo especial
@@ -244,18 +251,21 @@ public class AnalisadorLexico {
                             num_int.add(token);
                             token = "";
                             estado = 0;
+                
                         }
                         else if(estado == 2) {
                             num_decimal.add(token);
                             decimal = false;
                             token = "";
                             estado = 0;
+                
                         }
                         else if(estado == 3) {
                             identificador.add(token);
                             id = false;
                             token = "";
                             estado = 0;
+                
                         }
 
                     }
@@ -274,18 +284,21 @@ public class AnalisadorLexico {
                                         num_int.add(token);
                                         token = "";
                                         estado = 0;
+                            
                                     }
                                     else if(estado == 2) {
                                         num_decimal.add(token);
                                         decimal = false;
                                         token = "";
                                         estado = 0;
+                            
                                     }
                                     else if(estado == 3) {
                                         identificador.add(token);
                                         id = false;
                                         token = "";
                                         estado = 0;
+                            
                                     }
                                     break;
                                 }
@@ -293,28 +306,53 @@ public class AnalisadorLexico {
                         }
                         if(estado == 1) {
                             num_int.add(token);
+                
                         }
                         else if(estado == 2) {
                             num_decimal.add(token);
                             decimal = false;
+                
                         }
                         else if(estado == 3) {
                             identificador.add(token);
                             id = false;
+                
                         }
                         estado = 0;
                         token = "";
                         continue;
                     }
+                    else if (posicao == '"') {
+                        if (lendoTexto) {
+                            // Se já estiver lendo texto e encontrar outra aspa dupla, considera isso como o fechamento
+                            texto.add(token);
+                            token = "";
+                            lendoTexto = false;
+                            erro = false;
+                        } else {
+                            // Se não estiver lendo texto, considera isso como o início
+                            lendoTexto = true;
+                            erro = true;
+                            token += posicao;
+                        }
+                    }
+                    
                 }
             }
+            
         }
         catch (IOException e) {
             System.out.print("Não foi possível ler o arquivo:\n" + e.getMessage());
             // caso arquivo não possa ser lido
         }
         finally {
-            type(); // chama função que exibe as listas dos tipos de token (palavra reservada, id, inteiro.. etc)
+            // chama função que exibe as listas dos tipos de token (palavra reservada, id, inteiro.. etc)
+            if(erro == true) {
+                System.out.println("O código apresenta erros e não foi possível concluir a análise.");
+            }
+            else {
+                type();
+            }
             try {
                if(br != null) {
                 br.close(); 
