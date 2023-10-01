@@ -1,4 +1,3 @@
-
 public class Verificador {
     // Verifica se é um número.
     public boolean isNumber(char x) {
@@ -7,7 +6,7 @@ public class Verificador {
     public boolean isDecimal(char x) {
         return x == '.';
     }
-
+    
     // Verificar se é um caracter.
     public boolean isChar(char x) {
         return (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z');
@@ -57,17 +56,6 @@ public class Verificador {
     // Verificar se é texto
     public boolean isOperatorText(char x) {
         return x == '"';
-    }
-
-    // Verificar se é uma palavra reservada.
-    public boolean isReservedWord(String x) {
-        try {
-            ReservedWord.valueOf(x.toUpperCase());
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-
     }
 
     // Verificar se é um caracter fora do padrão

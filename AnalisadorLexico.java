@@ -28,7 +28,7 @@ public class AnalisadorLexico {
         //  variáveis usadas
         int i = 0, ultimaPosicao = 0;
         char posicao, posicaoAnterior;
-        boolean achou, id = false, decimal = false;
+        boolean achou = false, achou2 = false, id = false, decimal = false;
         String token = "";
         String [] palavraReservadas = {"int", "float", "char", "boolean", "void", "double", "if", "else", "for", 
         "while", "scanf", "println", "main", "abstract", "assert", "return", "break", "byte", "case", "catch",
@@ -47,22 +47,85 @@ public class AnalisadorLexico {
             // isso lerá cada linha do arquivo enquanto ele não for nulo:
             String line = br.readLine();
 
-            int index = 0, estado = 0;
+            int index = 0, index2 = 0, estado = 0;
             String linhaSemComentario;
 
             // Loop para retirar comentários das linhas.
             while(line != null) {
+
+                if(achou2) {
+                    if(!line.contains("*/")) {
+                        line = br.readLine();
+                        continue;
+                    }
+                }
                 if(line.contains("//")) {
                     index = line.indexOf('/');
-                    linhaSemComentario = line.substring(0, index - 1);
-                    linhas.add(linhaSemComentario);
+                    if(index != 0) {
+                        linhaSemComentario = line.substring(0, index - 1);
+                        linhas.add(linhaSemComentario);
+                    }
                 }
+                else if(line.contains("/*")) {
+                    
+                    index = line.indexOf("/*");
+                    achou2 = true;
+
+                    if(index > 0) {
+                        if((index + 1) != line.length()) {
+                            if(line.charAt((index + 1)) != '/') {
+                                linhaSemComentario = line.substring(0, index - 1);
+                                linhas.add(linhaSemComentario);
+                            }
+                        }
+                    }
+                    index = 0;
+                }
+                else if(line.contains("*/")) {
+
+                    achou2 = false;
+                    index = line.indexOf("*/");
+
+                    if(index > 0) {
+                        if((index + 1) != line.length()) {
+                            linhaSemComentario = line.substring(index + 1, line.length() - 1);
+                            linhas.add(linhaSemComentario);
+                        }
+                        else {
+                            if((index + 1) != line.length()) {
+                                linhaSemComentario = line.substring(index + 1, index2 - 1);
+                                linhas.add(linhaSemComentario);
+                            }
+                        }
+                    }
+                    else {
+                        if(index != line.length() - 1) {
+                            linhaSemComentario = line.substring(index + 1, line.length() - 1);
+                            linhas.add(linhaSemComentario);
+                        }
+                    }
+                    index = 0;
+                }
+                // String.valueOf(line.charAt(z)) != "*/"
+                // line.replaceAll(String.valueOf(line.charAt(z)), "");  
+                //if(index != 0) {
+                 //       linhaSemComentario = line.substring(0, index - 1);
+                  //      linhas.add(linhaSemComentario);
+                  //  }         
+                //else if(line.contains("*/")) {
+//
+                 //   index = line.indexOf("*/");
+                  //  if(index != 0) {
+                  //      linhaSemComentario = line.substring(0, index - 1 );
+                  //      linhas.add(linhaSemComentario);
+                  //  }
+                //}       
                 else {
                     linhas.add(line);
                 }
                 line = br.readLine();
             }
-
+            
             // loop principal para categorizar os tokens
             for(i = 0; i < linhas.size(); i++) {
 
@@ -153,15 +216,47 @@ public class AnalisadorLexico {
                         // verifica se é operador
                     } else if (verificador.isOperatorLogico(posicao) || verificador.isOperatorAritmetico(posicao) ||
                         verificador.isOperatorAtribuicao(posicao) || verificador.isOperatorComparacao(posicao)) {
-                        
+
                         operadores.add(String.valueOf(posicao));
-                        token = "";
+                        if(estado == 1) {
+                            num_int.add(token);
+                            token = "";
+                            estado = 0;
+                        }
+                        else if(estado == 2) {
+                            num_decimal.add(token);
+                            decimal = false;
+                            token = "";
+                            estado = 0;
+                        }
+                        else if(estado == 3) {
+                            identificador.add(token);
+                            id = false;
+                            token = "";
+                            estado = 0;
+                        }
 
                         // verifica se é símbolo especial
                     } else if (verificador.isOperatorSymb(posicao)) {
 
                         simbolosEspeciais.add(String.valueOf(posicao));
-                        token = "";
+                        if(estado == 1) {
+                            num_int.add(token);
+                            token = "";
+                            estado = 0;
+                        }
+                        else if(estado == 2) {
+                            num_decimal.add(token);
+                            decimal = false;
+                            token = "";
+                            estado = 0;
+                        }
+                        else if(estado == 3) {
+                            identificador.add(token);
+                            id = false;
+                            token = "";
+                            estado = 0;
+                        }
 
                     }
                     // ignora espaço em branco e a partir dele finaliza a concatenação do token para adicioná-lo
@@ -170,7 +265,6 @@ public class AnalisadorLexico {
 
                         // verifica se é o final da linha e onde adicionar o respectivo token pelo seu estado 
                         if(verificador.isEndOfLine(posicao)) {
-
                             simbolosEspeciais.add(String.valueOf(posicao));
                             
                             if(z > 0) {
